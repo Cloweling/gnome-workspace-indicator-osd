@@ -44,5 +44,61 @@
       </description>
     </key>
 
+    <key name="container-background-color" type="s">
+      <default>'rgba(0,0,0,0)'</default>
+      <summary>OSD container background color</summary>
+      <description>
+        Background color of the OSD container box. Fully transparent by default.
+      </description>
+    </key>
+
+    <key name="container-border-radius" type="i">
+      <default>24</default>
+      <summary>OSD container corner radius</summary>
+      <description>
+        Corner radius, in pixels, of the OSD container box.
+      </description>
+    </key>
+
+    <key name="active-text-color" type="s">
+      <default>'rgba(255,255,255,1.0)'</default>
+      <summary>Active workspace text color</summary>
+      <description>
+        Color used for the icon and name of the active workspace.
+      </description>
+    </key>
+
+    <key name="active-background-color" type="s">
+      <default>'rgba(0,0,0,0)'</default>
+      <summary>Active workspace background color</summary>
+      <description>
+        Background color behind the active workspace indicator.
+      </description>
+    </key>
+
+    <key name="inactive-text-color" type="s">
+      <default>'rgba(255,255,255,1.0)'</default>
+      <summary>Inactive workspace text color</summary>
+      <description>
+        Color used for the icon and name of inactive workspaces.
+      </description>
+    </key>
+
+    <key name="inactive-background-color" type="s">
+      <default>'rgba(0,0,0,0)'</default>
+      <summary>Inactive workspace background color</summary>
+      <description>
+        Background color behind inactive workspace indicators.
+      </description>
+    </key>
+
+    <key name="indicator-border-radius" type="i">
+      <default>10</default>
+      <summary>Workspace indicator corner radius</summary>
+      <description>
+        Corner radius, in pixels, of each workspace indicator.
+      </description>
+    </key>
+
   </schema>
 </schemalist>

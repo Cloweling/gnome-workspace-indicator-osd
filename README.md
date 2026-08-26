@@ -10,6 +10,9 @@ A GNOME Shell extension for GNOME 50+ that shows a custom on-screen display (OSD
 - Configurable per-workspace names and icons/emojis
 - Dynamic workspace count with add/remove buttons in preferences
 - Configurable display duration
+- Fully transparent look by default: no grey box, no borders, active and inactive workspaces styled the same
+- Separate text and background colors for the active and inactive workspaces
+- Configurable corner radius for the OSD container and for each indicator
 - Does not touch the top panel
 - Ready for localization (i18n)
 
@@ -76,6 +79,9 @@ Open the extension preferences to configure:
 - Workspace names
 - Workspace icons/emojis
 - Display duration
+- OSD container background color and corner radius
+- Active/inactive text and background colors
+- Indicator corner radius
 
 ## Settings schema
 
@@ -88,8 +94,17 @@ Keys:
 - `display-mode` (`s`) — `dots`, `icon`, `text`, or `both`
 - `workspace-count` (`i`)
 - `osd-duration-ms` (`i`)
+- `container-background-color` (`s`) — CSS color, default `rgba(0,0,0,0)` (transparent)
+- `container-border-radius` (`i`) — default `24`
+- `active-text-color` (`s`) — default `rgba(255,255,255,1.0)`
+- `active-background-color` (`s`) — default `rgba(0,0,0,0)` (transparent)
+- `inactive-text-color` (`s`) — default `rgba(255,255,255,1.0)`
+- `inactive-background-color` (`s`) — default `rgba(0,0,0,0)` (transparent)
+- `indicator-border-radius` (`i`) — default `10`
 
 ## Notes
 
 - Designed for GNOME Shell 50 and newer.
 - `locale/` is intentionally empty for translations.
+- Colors are stored as CSS strings, so any value accepted by `Gdk.RGBA` works (`rgba(...)`, `rgb(...)`, `#rrggbb`).
+- Colors and radii only apply to the icon/text display modes; the `dots` mode keeps the native GNOME dots, but still honours the container background and radius.

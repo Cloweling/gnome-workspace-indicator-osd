@@ -69,30 +69,64 @@ export default class WorkspaceIndicatorExtension extends Extension {
         if (!this._settings)
             return;
 
-        const mode = this._settings.get_string('display-mode');
-        if (mode === MODE_DOTS)
-            return;
-
         const list = monitorPopup._list;
         if (!list)
             return;
+
+        const mode = this._settings.get_string('display-mode');
+
+        list.set_style(this._containerStyle());
+
+        if (mode === MODE_DOTS)
+            return;
+
+        const indicatorRadius = Math.max(0, this._settings.get_int('indicator-border-radius'));
 
         list.get_children().forEach((indicator, index) => {
             if (typeof indicator.set_child !== 'function')
                 return;
 
-            const content = this._buildContent(this._getWorkspaceInfo(index), mode);
+            const active = indicator.has_style_pseudo_class('active');
+            const textColor = this._color(active ? 'active-text-color' : 'inactive-text-color');
+            const backgroundColor = this._color(active ? 'active-background-color' : 'inactive-background-color');
+
+            const content = this._buildContent(this._getWorkspaceInfo(index), mode, textColor);
             if (!content)
                 return;
 
             indicator.set_child(content);
-            indicator.set_style(
-                'min-width: 0; min-height: 0; width: auto; height: auto; padding: 6px 12px; border-radius: 10px;'
-            );
+            indicator.set_style([
+                'min-width: 0',
+                'min-height: 0',
+                'width: auto',
+                'height: auto',
+                'padding: 6px 12px',
+                'margin: 0',
+                'border-width: 0',
+                `border-radius: ${indicatorRadius}px`,
+                `background-color: ${backgroundColor}`,
+                `color: ${textColor}`,
+            ].join('; ') + ';');
         });
     }
 
-    _buildContent(info, mode) {
+    _containerStyle() {
+        const radius = Math.max(0, this._settings.get_int('container-border-radius'));
+        const background = this._color('container-background-color');
+
+        return [
+            'border-width: 0',
+            `border-radius: ${radius}px`,
+            `background-color: ${background}`,
+        ].join('; ') + ';';
+    }
+
+    _color(key) {
+        const value = this._settings.get_string(key).trim();
+        return value.length > 0 ? value : 'transparent';
+    }
+
+    _buildContent(info, mode, textColor) {
         const box = new St.BoxLayout({
             orientation: Clutter.Orientation.HORIZONTAL,
             x_align: Clutter.ActorAlign.CENTER,
@@ -107,7 +141,7 @@ export default class WorkspaceIndicatorExtension extends Extension {
             box.add_child(new St.Label({
                 text: info.icon,
                 y_align: Clutter.ActorAlign.CENTER,
-                style: 'font-size: 18px;',
+                style: `font-size: 18px; color: ${textColor};`,
             }));
         }
 
@@ -115,7 +149,7 @@ export default class WorkspaceIndicatorExtension extends Extension {
             box.add_child(new St.Label({
                 text: info.name,
                 y_align: Clutter.ActorAlign.CENTER,
-                style: 'font-size: 14px; font-weight: 700;',
+                style: `font-size: 14px; font-weight: 700; color: ${textColor};`,
             }));
         }
 

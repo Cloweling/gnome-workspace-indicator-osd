@@ -1,4 +1,5 @@
 import Adw from 'gi://Adw';
+import Gdk from 'gi://Gdk?version=4.0';
 import GObject from 'gi://GObject';
 import Gtk from 'gi://Gtk';
 
@@ -20,6 +21,7 @@ class WorkspaceIndicatorPrefsPage extends Adw.PreferencesPage {
         this._rows = [];
 
         this._buildGeneralGroup();
+        this._buildAppearanceGroup();
         this._buildWorkspaceGroup();
         this._rebuildWorkspaceRows();
     }
@@ -65,6 +67,102 @@ class WorkspaceIndicatorPrefsPage extends Adw.PreferencesPage {
         group.add(modeRow);
         group.add(durationRow);
         this.add(group);
+    }
+
+    _buildAppearanceGroup() {
+        const containerGroup = new Adw.PreferencesGroup({
+            title: _('OSD Container'),
+            description: _('The box that wraps every workspace indicator. Transparent by default.'),
+        });
+
+        containerGroup.add(this._createColorRow(
+            _('Background Color'),
+            _('Set the alpha channel to zero for a fully transparent OSD.'),
+            'container-background-color'
+        ));
+        containerGroup.add(this._createRadiusRow(
+            _('Corner Radius (px)'),
+            _('Rounds the corners of the OSD container.'),
+            'container-border-radius'
+        ));
+
+        this.add(containerGroup);
+
+        const indicatorGroup = new Adw.PreferencesGroup({
+            title: _('Workspace Indicators'),
+            description: _('Colors of each workspace entry. Backgrounds are transparent by default.'),
+        });
+
+        indicatorGroup.add(this._createColorRow(
+            _('Active Text Color'),
+            _('Icon and name color of the current workspace.'),
+            'active-text-color'
+        ));
+        indicatorGroup.add(this._createColorRow(
+            _('Active Background Color'),
+            _('Background behind the current workspace.'),
+            'active-background-color'
+        ));
+        indicatorGroup.add(this._createColorRow(
+            _('Inactive Text Color'),
+            _('Icon and name color of the other workspaces.'),
+            'inactive-text-color'
+        ));
+        indicatorGroup.add(this._createColorRow(
+            _('Inactive Background Color'),
+            _('Background behind the other workspaces.'),
+            'inactive-background-color'
+        ));
+        indicatorGroup.add(this._createRadiusRow(
+            _('Corner Radius (px)'),
+            _('Rounds the corners of each workspace indicator.'),
+            'indicator-border-radius'
+        ));
+
+        this.add(indicatorGroup);
+    }
+
+    _createColorRow(title, subtitle, key) {
+        const row = new Adw.ActionRow({title, subtitle});
+
+        const rgba = new Gdk.RGBA();
+        if (!rgba.parse(this._settings.get_string(key)))
+            rgba.parse('rgba(0,0,0,0)');
+
+        const button = new Gtk.ColorDialogButton({
+            dialog: new Gtk.ColorDialog({with_alpha: true}),
+            rgba,
+            valign: Gtk.Align.CENTER,
+        });
+
+        button.connect('notify::rgba', widget => {
+            this._settings.set_string(key, widget.get_rgba().to_string());
+        });
+
+        row.add_suffix(button);
+        row.activatable_widget = button;
+
+        return row;
+    }
+
+    _createRadiusRow(title, subtitle, key) {
+        const row = new Adw.SpinRow({
+            title,
+            subtitle,
+            adjustment: new Gtk.Adjustment({
+                lower: 0,
+                upper: 64,
+                step_increment: 1,
+                page_increment: 4,
+                value: this._settings.get_int(key),
+            }),
+        });
+
+        row.connect('notify::value', widget => {
+            this._settings.set_int(key, Math.round(widget.value));
+        });
+
+        return row;
     }
 
     _buildWorkspaceGroup() {
