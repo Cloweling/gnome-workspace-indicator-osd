@@ -113,9 +113,11 @@ export default class WorkspaceIndicatorExtension extends Extension {
     _containerStyle() {
         const radius = Math.max(0, this._settings.get_int('container-border-radius'));
         const background = this._color('container-background-color');
+        const spacing = Math.max(0, this._settings.get_int('indicator-spacing'));
 
         return [
             'border-width: 0',
+            `spacing: ${spacing}px`,
             `border-radius: ${radius}px`,
             `background-color: ${background}`,
         ].join('; ') + ';';

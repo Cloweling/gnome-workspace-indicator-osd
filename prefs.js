@@ -80,7 +80,7 @@ class WorkspaceIndicatorPrefsPage extends Adw.PreferencesPage {
             _('Set the alpha channel to zero for a fully transparent OSD.'),
             'container-background-color'
         ));
-        containerGroup.add(this._createRadiusRow(
+        containerGroup.add(this._createPixelRow(
             _('Corner Radius (px)'),
             _('Rounds the corners of the OSD container.'),
             'container-border-radius'
@@ -113,7 +113,13 @@ class WorkspaceIndicatorPrefsPage extends Adw.PreferencesPage {
             _('Background behind the other workspaces.'),
             'inactive-background-color'
         ));
-        indicatorGroup.add(this._createRadiusRow(
+        indicatorGroup.add(this._createPixelRow(
+            _('Spacing (px)'),
+            _('Horizontal gap between each workspace.'),
+            'indicator-spacing',
+            96
+        ));
+        indicatorGroup.add(this._createPixelRow(
             _('Corner Radius (px)'),
             _('Rounds the corners of each workspace indicator.'),
             'indicator-border-radius'
@@ -145,13 +151,13 @@ class WorkspaceIndicatorPrefsPage extends Adw.PreferencesPage {
         return row;
     }
 
-    _createRadiusRow(title, subtitle, key) {
+    _createPixelRow(title, subtitle, key, upper = 64) {
         const row = new Adw.SpinRow({
             title,
             subtitle,
             adjustment: new Gtk.Adjustment({
                 lower: 0,
-                upper: 64,
+                upper,
                 step_increment: 1,
                 page_increment: 4,
                 value: this._settings.get_int(key),

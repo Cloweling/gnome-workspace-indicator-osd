@@ -13,6 +13,7 @@ A GNOME Shell extension for GNOME 50+ that shows a custom on-screen display (OSD
 - Fully transparent look by default: no grey box, no borders, active and inactive workspaces styled the same
 - Separate text and background colors for the active and inactive workspaces
 - Configurable corner radius for the OSD container and for each indicator
+- Configurable spacing between workspaces
 - Does not touch the top panel
 - Ready for localization (i18n)
 
@@ -81,6 +82,7 @@ Open the extension preferences to configure:
 - Display duration
 - OSD container background color and corner radius
 - Active/inactive text and background colors
+- Spacing between workspaces
 - Indicator corner radius
 
 ## Settings schema
@@ -100,6 +102,7 @@ Keys:
 - `active-background-color` (`s`) — default `rgba(0,0,0,0)` (transparent)
 - `inactive-text-color` (`s`) — default `rgba(255,255,255,1.0)`
 - `inactive-background-color` (`s`) — default `rgba(0,0,0,0)` (transparent)
+- `indicator-spacing` (`i`) — default `12`
 - `indicator-border-radius` (`i`) — default `10`
 
 ## Notes
