@@ -4,13 +4,12 @@ A GNOME Shell extension for GNOME 50+ that shows a custom on-screen display (OSD
 
 ## Features
 
-- Detects workspace changes via the `workspace-switched` signal
-- Shows a custom overlay OSD on screen
-- Displays the current workspace name and icon
-- Auto-hides after 1.5 seconds by default
+- Replaces the plain dots of the native GNOME workspace switcher OSD
+- Displays a custom name and/or icon for the workspace you switch to
+- Three display modes: icons only, text only, or icons and text
 - Configurable per-workspace names and icons/emojis
-- Configurable OSD position
 - Configurable display duration
+- Does not touch the top panel
 - Ready for localization (i18n)
 
 ## Structure
@@ -71,9 +70,9 @@ Then enable it from the Extensions app.
 
 Open the extension preferences to configure:
 
+- Display mode (icons only / text only / both)
 - Workspace names
 - Workspace icons/emojis
-- OSD position
 - Display duration
 
 ## Settings schema
@@ -84,7 +83,7 @@ Keys:
 
 - `workspace-names` (`as`)
 - `workspace-icons` (`as`)
-- `position` (`s`)
+- `display-mode` (`s`) — `icon`, `text`, or `both`
 - `osd-duration-ms` (`i`)
 
 ## Notes

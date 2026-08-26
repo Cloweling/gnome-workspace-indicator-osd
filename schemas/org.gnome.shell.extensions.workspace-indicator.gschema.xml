@@ -19,11 +19,12 @@
       </description>
     </key>
 
-    <key name="position" type="s">
-      <default>'top-center'</default>
-      <summary>OSD position</summary>
+    <key name="display-mode" type="s">
+      <default>'both'</default>
+      <summary>OSD display mode</summary>
       <description>
-        Accepted values: top-center, center, bottom-center.
+        What to render inside the workspace switcher OSD.
+        Accepted values: icon, text, both.
       </description>
     </key>
 
@@ -31,7 +32,7 @@
       <default>1500</default>
       <summary>OSD duration in milliseconds</summary>
       <description>
-        Duration before auto-hide.
+        Duration before the workspace switcher OSD hides.
       </description>
     </key>
 

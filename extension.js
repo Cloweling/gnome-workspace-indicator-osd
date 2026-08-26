@@ -1,206 +1,152 @@
 import Clutter from 'gi://Clutter';
-import GObject from 'gi://GObject';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
 
 import {Extension, gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
-import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import {WorkspaceSwitcherPopup} from 'resource:///org/gnome/shell/ui/workspaceSwitcherPopup.js';
 
-const DEFAULT_ICONS = ['1️⃣', '2️⃣', '3️⃣', '4️⃣'];
+const DEFAULT_ICONS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
 
-const POSITION_TOP_CENTER = 'top-center';
-const POSITION_CENTER = 'center';
-const POSITION_BOTTOM_CENTER = 'bottom-center';
-
-const WorkspaceIndicatorOSD = GObject.registerClass(
-class WorkspaceIndicatorOSD extends St.BoxLayout {
-    _init() {
-        super._init({
-            style_class: 'workspace-indicator-osd',
-            orientation: Clutter.Orientation.HORIZONTAL,
-            reactive: false,
-            can_focus: false,
-            visible: false,
-            opacity: 0,
-        });
-
-        this.set_style(`
-            padding: 14px 18px;
-            border-radius: 14px;
-            background-color: rgba(20, 20, 20, 0.78);
-            color: #ffffff;
-            spacing: 10px;
-        `);
-
-        this._iconLabel = new St.Label({
-            text: '',
-            y_align: Clutter.ActorAlign.CENTER,
-        });
-        this._iconLabel.set_style('font-size: 24px;');
-
-        this._nameLabel = new St.Label({
-            text: '',
-            y_align: Clutter.ActorAlign.CENTER,
-        });
-        this._nameLabel.set_style('font-size: 16px; font-weight: 700;');
-
-        this.add_child(this._iconLabel);
-        this.add_child(this._nameLabel);
-    }
-
-    setContent(icon, name) {
-        this._iconLabel.text = icon ?? '';
-        this._nameLabel.text = name ?? '';
-
-        this._iconLabel.visible = this._iconLabel.text.trim().length > 0;
-        this._nameLabel.visible = this._nameLabel.text.trim().length > 0;
-    }
-});
+const MODE_ICON = 'icon';
+const MODE_TEXT = 'text';
+const MODE_BOTH = 'both';
 
 export default class WorkspaceIndicatorExtension extends Extension {
     enable() {
         this._settings = this.getSettings();
-        this._osd = new WorkspaceIndicatorOSD();
 
-        Main.layoutManager.addChrome(this._osd);
+        this._originalRedisplay = WorkspaceSwitcherPopup.prototype._redisplay;
+        this._originalDisplay = WorkspaceSwitcherPopup.prototype.display;
 
-        this._workspaceSignalId = global.workspace_manager.connect(
-            'workspace-switched',
-            this._onWorkspaceSwitched.bind(this)
-        );
+        const extension = this;
 
-        this._timeoutId = 0;
-        this._animationDurationMs = 120;
+        WorkspaceSwitcherPopup.prototype._redisplay = function () {
+            extension._originalRedisplay.call(this);
+            extension._decorate(this);
+        };
 
-        this._settingsChangedIds = [
-            this._settings.connect('changed::position', () => this._repositionOsd()),
-            this._settings.connect('changed::osd-duration-ms', () => {}),
-            this._settings.connect('changed::workspace-names', () => {}),
-            this._settings.connect('changed::workspace-icons', () => {}),
-        ];
-
-        this._repositionOsd();
+        WorkspaceSwitcherPopup.prototype.display = function (activeWorkspaceIndex) {
+            extension._originalDisplay.call(this, activeWorkspaceIndex);
+            extension._applyDuration(this);
+        };
     }
 
     disable() {
-        if (this._timeoutId) {
-            GLib.source_remove(this._timeoutId);
-            this._timeoutId = 0;
+        if (this._originalRedisplay) {
+            WorkspaceSwitcherPopup.prototype._redisplay = this._originalRedisplay;
+            this._originalRedisplay = null;
         }
 
-        if (this._workspaceSignalId) {
-            global.workspace_manager.disconnect(this._workspaceSignalId);
-            this._workspaceSignalId = 0;
-        }
-
-        if (this._settingsChangedIds) {
-            for (const id of this._settingsChangedIds)
-                this._settings.disconnect(id);
-            this._settingsChangedIds = null;
-        }
-
-        if (this._osd) {
-            this._osd.remove_all_transitions();
-            this._osd.destroy();
-            this._osd = null;
+        if (this._originalDisplay) {
+            WorkspaceSwitcherPopup.prototype.display = this._originalDisplay;
+            this._originalDisplay = null;
         }
 
         this._settings = null;
     }
 
-    _onWorkspaceSwitched() {
-        const activeIndex = global.workspace_manager.get_active_workspace_index();
-        const workspaceInfo = this._getWorkspaceInfo(activeIndex);
+    _applyDuration(popup) {
+        if (!this._settings)
+            return;
 
-        this._showOsd(workspaceInfo.icon, workspaceInfo.name);
+        const duration = Math.max(100, this._settings.get_int('osd-duration-ms'));
+
+        if (popup._timeoutId) {
+            GLib.source_remove(popup._timeoutId);
+            popup._timeoutId = 0;
+        }
+
+        if (typeof popup._onTimeout !== 'function')
+            return;
+
+        popup._timeoutId = GLib.timeout_add(
+            GLib.PRIORITY_DEFAULT,
+            duration,
+            popup._onTimeout.bind(popup)
+        );
+    }
+
+    _decorate(popup) {
+        if (!this._settings)
+            return;
+
+        const list = popup._list;
+        if (!list)
+            return;
+
+        const mode = this._settings.get_string('display-mode');
+        const indicators = list.get_children();
+
+        indicators.forEach((indicator, index) => {
+            if (typeof indicator.set_child !== 'function')
+                return;
+
+            const info = this._getWorkspaceInfo(index);
+            const content = this._buildContent(info, mode);
+
+            if (!content)
+                return;
+
+            indicator.set_child(content);
+            indicator.set_style(`
+                min-width: 0;
+                min-height: 0;
+                width: auto;
+                height: auto;
+                padding: 6px 12px;
+                border-radius: 10px;
+            `);
+        });
+    }
+
+    _buildContent(info, mode) {
+        const box = new St.BoxLayout({
+            orientation: Clutter.Orientation.HORIZONTAL,
+            x_align: Clutter.ActorAlign.CENTER,
+            y_align: Clutter.ActorAlign.CENTER,
+            style: 'spacing: 8px;',
+        });
+
+        const showIcon = mode === MODE_ICON || mode === MODE_BOTH;
+        const showText = mode === MODE_TEXT || mode === MODE_BOTH;
+
+        if (showIcon && info.icon.length > 0) {
+            const iconLabel = new St.Label({
+                text: info.icon,
+                y_align: Clutter.ActorAlign.CENTER,
+                style: 'font-size: 18px;',
+            });
+            box.add_child(iconLabel);
+        }
+
+        if (showText && info.name.length > 0) {
+            const nameLabel = new St.Label({
+                text: info.name,
+                y_align: Clutter.ActorAlign.CENTER,
+                style: 'font-size: 14px; font-weight: 700;',
+            });
+            box.add_child(nameLabel);
+        }
+
+        if (box.get_n_children() === 0)
+            return null;
+
+        return box;
     }
 
     _getWorkspaceInfo(index) {
         const names = this._settings.get_strv('workspace-names');
         const icons = this._settings.get_strv('workspace-icons');
 
+        const configuredName = (names[index] ?? '').trim();
+        const configuredIcon = (icons[index] ?? '').trim();
+
+        const fallbackIcon = index < DEFAULT_ICONS.length ? DEFAULT_ICONS[index] : `${index + 1}`;
         const fallbackName = `${_('Workspace')} ${index + 1}`;
 
-        const fallbackIcon = index < DEFAULT_ICONS.length
-            ? DEFAULT_ICONS[index]
-            : '';
-
-        const configuredName = names[index] ?? '';
-        const configuredIcon = icons[index] ?? '';
-
         return {
-            name: configuredName.trim().length > 0 ? configuredName : fallbackName,
-            icon: configuredIcon.trim().length > 0 ? configuredIcon : fallbackIcon,
+            name: configuredName.length > 0 ? configuredName : fallbackName,
+            icon: configuredIcon.length > 0 ? configuredIcon : fallbackIcon,
         };
-    }
-
-    _showOsd(icon, name) {
-        if (!this._osd)
-            return;
-
-        this._osd.remove_all_transitions();
-
-        if (this._timeoutId) {
-            GLib.source_remove(this._timeoutId);
-            this._timeoutId = 0;
-        }
-
-        this._osd.setContent(icon, name);
-        this._repositionOsd();
-
-        this._osd.opacity = 0;
-        this._osd.visible = true;
-        this._osd.ease({
-            opacity: 255,
-            duration: this._animationDurationMs,
-            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-        });
-
-        const duration = Math.max(100, this._settings.get_int('osd-duration-ms'));
-        this._timeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, duration, () => {
-            this._timeoutId = 0;
-
-            if (!this._osd)
-                return GLib.SOURCE_REMOVE;
-
-            this._osd.remove_all_transitions();
-            this._osd.ease({
-                opacity: 0,
-                duration: this._animationDurationMs,
-                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-                onComplete: () => {
-                    if (this._osd)
-                        this._osd.visible = false;
-                },
-            });
-
-            return GLib.SOURCE_REMOVE;
-        });
-    }
-
-    _repositionOsd() {
-        if (!this._osd)
-            return;
-
-        const position = this._settings.get_string('position');
-        const monitor = Main.layoutManager.primaryMonitor;
-
-        if (!monitor)
-            return;
-
-        this._osd.get_parent()?.set_child_above_sibling(this._osd, null);
-
-        this._osd.set_position(0, 0);
-        this._osd.set_size(-1, -1);
-
-        this._osd.x = Math.round(monitor.x + (monitor.width - this._osd.width) / 2);
-
-        if (position === POSITION_CENTER) {
-            this._osd.y = Math.round(monitor.y + (monitor.height - this._osd.height) / 2);
-        } else if (position === POSITION_BOTTOM_CENTER) {
-            this._osd.y = Math.round(monitor.y + monitor.height - this._osd.height - 80);
-        } else {
-            this._osd.y = Math.round(monitor.y + 80);
-        }
     }
 }

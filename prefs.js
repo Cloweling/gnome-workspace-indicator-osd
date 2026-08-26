@@ -4,7 +4,8 @@ import Gtk from 'gi://Gtk';
 
 import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
-const DEFAULT_ROWS = 8;
+const DEFAULT_ROWS = 10;
+const DISPLAY_MODES = ['icon', 'text', 'both'];
 
 const WorkspaceIndicatorPrefsPage = GObject.registerClass(
 class WorkspaceIndicatorPrefsPage extends Adw.PreferencesPage {
@@ -23,25 +24,23 @@ class WorkspaceIndicatorPrefsPage extends Adw.PreferencesPage {
     _buildGeneralGroup() {
         const group = new Adw.PreferencesGroup({
             title: _('Display Settings'),
-            description: _('Configure where and for how long the OSD appears.'),
+            description: _('Configure what the workspace switcher OSD shows.'),
         });
 
-        const positionRow = new Adw.ComboRow({
-            title: _('OSD Position'),
-            subtitle: _('Screen placement of the workspace indicator.'),
+        const modeRow = new Adw.ComboRow({
+            title: _('Display Mode'),
+            subtitle: _('Show only icons, only text, or both.'),
             model: Gtk.StringList.new([
-                _('Top Center'),
-                _('Center'),
-                _('Bottom Center'),
+                _('Icons only'),
+                _('Text only'),
+                _('Icons and text'),
             ]),
         });
 
-        const positions = ['top-center', 'center', 'bottom-center'];
-        const currentPosition = this._settings.get_string('position');
-        const currentIndex = Math.max(0, positions.indexOf(currentPosition));
-        positionRow.set_selected(currentIndex);
-        positionRow.connect('notify::selected', row => {
-            this._settings.set_string('position', positions[row.selected]);
+        const currentMode = this._settings.get_string('display-mode');
+        modeRow.set_selected(Math.max(0, DISPLAY_MODES.indexOf(currentMode)));
+        modeRow.connect('notify::selected', row => {
+            this._settings.set_string('display-mode', DISPLAY_MODES[row.selected]);
         });
 
         const durationRow = new Adw.SpinRow({
@@ -59,7 +58,7 @@ class WorkspaceIndicatorPrefsPage extends Adw.PreferencesPage {
             this._settings.set_int('osd-duration-ms', Math.round(row.value));
         });
 
-        group.add(positionRow);
+        group.add(modeRow);
         group.add(durationRow);
         this.add(group);
     }
@@ -67,7 +66,7 @@ class WorkspaceIndicatorPrefsPage extends Adw.PreferencesPage {
     _buildWorkspaceGroup() {
         const group = new Adw.PreferencesGroup({
             title: _('Workspace Labels'),
-            description: _('Set custom icon and name for each workspace index.'),
+            description: _('Set a custom icon and name for each workspace.'),
         });
 
         const names = this._settings.get_strv('workspace-names');
@@ -80,14 +79,14 @@ class WorkspaceIndicatorPrefsPage extends Adw.PreferencesPage {
             });
 
             const iconEntry = new Gtk.Entry({
-                placeholder_text: _('Icon / Emoji'),
-                width_chars: 8,
+                placeholder_text: _('Icon'),
+                width_chars: 6,
                 text: icons[i] ?? '',
                 valign: Gtk.Align.CENTER,
             });
 
             const nameEntry = new Gtk.Entry({
-                placeholder_text: _('Workspace name'),
+                placeholder_text: _('Name'),
                 hexpand: true,
                 text: names[i] ?? '',
                 valign: Gtk.Align.CENTER,
@@ -126,6 +125,6 @@ export default class WorkspaceIndicatorPreferences extends ExtensionPreferences 
     fillPreferencesWindow(window) {
         const settings = this.getSettings();
         window.add(new WorkspaceIndicatorPrefsPage(settings));
-        window.set_default_size(760, 640);
+        window.set_default_size(760, 700);
     }
 }
