@@ -19,12 +19,20 @@
       </description>
     </key>
 
+    <key name="workspace-count" type="i">
+      <default>4</default>
+      <summary>Configured workspace rows</summary>
+      <description>
+        How many workspaces are configurable in the preferences window.
+      </description>
+    </key>
+
     <key name="display-mode" type="s">
       <default>'both'</default>
       <summary>OSD display mode</summary>
       <description>
         What to render inside the workspace switcher OSD.
-        Accepted values: icon, text, both.
+        Accepted values: dots, icon, text, both.
       </description>
     </key>
 

@@ -6,8 +6,9 @@ A GNOME Shell extension for GNOME 50+ that shows a custom on-screen display (OSD
 
 - Replaces the plain dots of the native GNOME workspace switcher OSD
 - Displays a custom name and/or icon for the workspace you switch to
-- Three display modes: icons only, text only, or icons and text
+- Four display modes: default dots, icons only, text only, or icons and text
 - Configurable per-workspace names and icons/emojis
+- Dynamic workspace count with add/remove buttons in preferences
 - Configurable display duration
 - Does not touch the top panel
 - Ready for localization (i18n)
@@ -70,7 +71,8 @@ Then enable it from the Extensions app.
 
 Open the extension preferences to configure:
 
-- Display mode (icons only / text only / both)
+- Display mode (default dots / icons only / text only / both)
+- Number of configurable workspaces (add/remove buttons)
 - Workspace names
 - Workspace icons/emojis
 - Display duration
@@ -83,7 +85,8 @@ Keys:
 
 - `workspace-names` (`as`)
 - `workspace-icons` (`as`)
-- `display-mode` (`s`) — `icon`, `text`, or `both`
+- `display-mode` (`s`) — `dots`, `icon`, `text`, or `both`
+- `workspace-count` (`i`)
 - `osd-duration-ms` (`i`)
 
 ## Notes
