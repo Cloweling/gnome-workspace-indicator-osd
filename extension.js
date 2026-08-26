@@ -6,13 +6,6 @@ import St from 'gi://St';
 import {Extension, gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
-const DEFAULT_NAMES = [
-    _('Workspace 1'),
-    _('Workspace 2'),
-    _('Workspace 3'),
-    _('Workspace 4'),
-];
-
 const DEFAULT_ICONS = ['1️⃣', '2️⃣', '3️⃣', '4️⃣'];
 
 const POSITION_TOP_CENTER = 'top-center';
@@ -126,9 +119,7 @@ export default class WorkspaceIndicatorExtension extends Extension {
         const names = this._settings.get_strv('workspace-names');
         const icons = this._settings.get_strv('workspace-icons');
 
-        const fallbackName = index < DEFAULT_NAMES.length
-            ? DEFAULT_NAMES[index]
-            : `${_('Workspace')} ${index + 1}`;
+        const fallbackName = `${_('Workspace')} ${index + 1}`;
 
         const fallbackIcon = index < DEFAULT_ICONS.length
             ? DEFAULT_ICONS[index]
