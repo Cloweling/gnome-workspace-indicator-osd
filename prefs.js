@@ -1,6 +1,8 @@
 import Adw from 'gi://Adw';
+import Gdk from 'gi://Gdk?version=4.0';
 import GObject from 'gi://GObject';
 import Gtk from 'gi://Gtk';
+import Pango from 'gi://Pango';
 
 import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
@@ -20,6 +22,7 @@ class WorkspaceIndicatorPrefsPage extends Adw.PreferencesPage {
         this._rows = [];
 
         this._buildGeneralGroup();
+        this._buildAppearanceGroup();
         this._buildWorkspaceGroup();
         this._rebuildWorkspaceRows();
     }
@@ -65,6 +68,171 @@ class WorkspaceIndicatorPrefsPage extends Adw.PreferencesPage {
         group.add(modeRow);
         group.add(durationRow);
         this.add(group);
+    }
+
+    _buildAppearanceGroup() {
+        const containerGroup = new Adw.PreferencesGroup({
+            title: _('OSD Container'),
+            description: _('The box that wraps every workspace indicator. Transparent by default.'),
+        });
+
+        containerGroup.add(this._createColorRow(
+            _('Background Color'),
+            _('Set the alpha channel to zero for a fully transparent OSD.'),
+            'container-background-color'
+        ));
+        containerGroup.add(this._createPixelRow(
+            _('Corner Radius (px)'),
+            _('Rounds the corners of the OSD container.'),
+            'container-border-radius'
+        ));
+
+        this.add(containerGroup);
+
+        const indicatorGroup = new Adw.PreferencesGroup({
+            title: _('Workspace Indicators'),
+            description: _('Colors of each workspace entry. Backgrounds are transparent by default.'),
+        });
+
+        indicatorGroup.add(this._createColorRow(
+            _('Active Text Color'),
+            _('Icon and name color of the current workspace.'),
+            'active-text-color'
+        ));
+        indicatorGroup.add(this._createColorRow(
+            _('Active Background Color'),
+            _('Background behind the current workspace.'),
+            'active-background-color'
+        ));
+        indicatorGroup.add(this._createColorRow(
+            _('Inactive Text Color'),
+            _('Icon and name color of the other workspaces.'),
+            'inactive-text-color'
+        ));
+        indicatorGroup.add(this._createColorRow(
+            _('Inactive Background Color'),
+            _('Background behind the other workspaces.'),
+            'inactive-background-color'
+        ));
+        indicatorGroup.add(this._createPixelRow(
+            _('Spacing (px)'),
+            _('Horizontal gap between each workspace.'),
+            'indicator-spacing',
+            96
+        ));
+        indicatorGroup.add(this._createPixelRow(
+            _('Corner Radius (px)'),
+            _('Rounds the corners of each workspace indicator.'),
+            'indicator-border-radius'
+        ));
+
+        this.add(indicatorGroup);
+
+        const fontGroup = new Adw.PreferencesGroup({
+            title: _('Font'),
+            description: _('Typography used for the workspace icons and names.'),
+        });
+
+        fontGroup.add(this._createFontRow(
+            _('Font Family'),
+            _('Defaults to the system monospace font when unset.'),
+            'font-family'
+        ));
+        fontGroup.add(this._createPixelRow(
+            _('Icon Size (px)'),
+            _('Font size of the workspace icons.'),
+            'icon-font-size',
+            128,
+            1
+        ));
+        fontGroup.add(this._createPixelRow(
+            _('Text Size (px)'),
+            _('Font size of the workspace names.'),
+            'text-font-size',
+            128,
+            1
+        ));
+
+        this.add(fontGroup);
+    }
+
+    _createFontRow(title, subtitle, key) {
+        const row = new Adw.ActionRow({title, subtitle});
+
+        const button = new Gtk.FontDialogButton({
+            dialog: new Gtk.FontDialog(),
+            level: Gtk.FontLevel.FAMILY,
+            valign: Gtk.Align.CENTER,
+            hexpand: false,
+        });
+
+        const stored = this._settings.get_string(key).trim();
+        button.set_font_desc(Pango.FontDescription.from_string(stored.length > 0 ? stored : 'monospace'));
+
+        button.connect('notify::font-desc', widget => {
+            const desc = widget.get_font_desc();
+            this._settings.set_string(key, desc ? desc.get_family() ?? '' : '');
+        });
+
+        const resetButton = new Gtk.Button({
+            icon_name: 'edit-clear-symbolic',
+            tooltip_text: _('Use the system monospace font'),
+            css_classes: ['flat'],
+            valign: Gtk.Align.CENTER,
+        });
+        resetButton.connect('clicked', () => {
+            this._settings.set_string(key, '');
+            button.set_font_desc(Pango.FontDescription.from_string('monospace'));
+        });
+
+        row.add_suffix(button);
+        row.add_suffix(resetButton);
+        row.activatable_widget = button;
+
+        return row;
+    }
+
+    _createColorRow(title, subtitle, key) {
+        const row = new Adw.ActionRow({title, subtitle});
+
+        const rgba = new Gdk.RGBA();
+        if (!rgba.parse(this._settings.get_string(key)))
+            rgba.parse('rgba(0,0,0,0)');
+
+        const button = new Gtk.ColorDialogButton({
+            dialog: new Gtk.ColorDialog({with_alpha: true}),
+            rgba,
+            valign: Gtk.Align.CENTER,
+        });
+
+        button.connect('notify::rgba', widget => {
+            this._settings.set_string(key, widget.get_rgba().to_string());
+        });
+
+        row.add_suffix(button);
+        row.activatable_widget = button;
+
+        return row;
+    }
+
+    _createPixelRow(title, subtitle, key, upper = 64, lower = 0) {
+        const row = new Adw.SpinRow({
+            title,
+            subtitle,
+            adjustment: new Gtk.Adjustment({
+                lower,
+                upper,
+                step_increment: 1,
+                page_increment: 4,
+                value: this._settings.get_int(key),
+            }),
+        });
+
+        row.connect('notify::value', widget => {
+            this._settings.set_int(key, Math.round(widget.value));
+        });
+
+        return row;
     }
 
     _buildWorkspaceGroup() {

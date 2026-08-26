@@ -44,5 +44,94 @@
       </description>
     </key>
 
+    <key name="container-background-color" type="s">
+      <default>'rgba(0,0,0,0)'</default>
+      <summary>OSD container background color</summary>
+      <description>
+        Background color of the OSD container box. Fully transparent by default.
+      </description>
+    </key>
+
+    <key name="container-border-radius" type="i">
+      <default>24</default>
+      <summary>OSD container corner radius</summary>
+      <description>
+        Corner radius, in pixels, of the OSD container box.
+      </description>
+    </key>
+
+    <key name="active-text-color" type="s">
+      <default>'rgba(255,255,255,1.0)'</default>
+      <summary>Active workspace text color</summary>
+      <description>
+        Color used for the icon and name of the active workspace.
+      </description>
+    </key>
+
+    <key name="active-background-color" type="s">
+      <default>'rgba(0,0,0,0)'</default>
+      <summary>Active workspace background color</summary>
+      <description>
+        Background color behind the active workspace indicator.
+      </description>
+    </key>
+
+    <key name="inactive-text-color" type="s">
+      <default>'rgba(255,255,255,1.0)'</default>
+      <summary>Inactive workspace text color</summary>
+      <description>
+        Color used for the icon and name of inactive workspaces.
+      </description>
+    </key>
+
+    <key name="inactive-background-color" type="s">
+      <default>'rgba(0,0,0,0)'</default>
+      <summary>Inactive workspace background color</summary>
+      <description>
+        Background color behind inactive workspace indicators.
+      </description>
+    </key>
+
+    <key name="font-family" type="s">
+      <default>''</default>
+      <summary>OSD font family</summary>
+      <description>
+        Font family used for the workspace icons and names.
+        When empty, the system monospace font is used.
+      </description>
+    </key>
+
+    <key name="icon-font-size" type="i">
+      <default>18</default>
+      <summary>Icon font size</summary>
+      <description>
+        Font size, in pixels, of the workspace icons.
+      </description>
+    </key>
+
+    <key name="text-font-size" type="i">
+      <default>14</default>
+      <summary>Text font size</summary>
+      <description>
+        Font size, in pixels, of the workspace names.
+      </description>
+    </key>
+
+    <key name="indicator-spacing" type="i">
+      <default>12</default>
+      <summary>Spacing between workspace indicators</summary>
+      <description>
+        Horizontal gap, in pixels, between each workspace indicator.
+      </description>
+    </key>
+
+    <key name="indicator-border-radius" type="i">
+      <default>10</default>
+      <summary>Workspace indicator corner radius</summary>
+      <description>
+        Corner radius, in pixels, of each workspace indicator.
+      </description>
+    </key>
+
   </schema>
 </schemalist>
