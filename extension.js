@@ -17,7 +17,7 @@ class WorkspaceIndicatorOSD extends St.BoxLayout {
     _init() {
         super._init({
             style_class: 'workspace-indicator-osd',
-            vertical: false,
+            orientation: Clutter.Orientation.HORIZONTAL,
             reactive: false,
             can_focus: false,
             visible: false,
