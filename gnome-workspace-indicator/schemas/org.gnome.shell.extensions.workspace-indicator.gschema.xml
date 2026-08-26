@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.workspace-indicator"
+          path="/org/gnome/shell/extensions/workspace-indicator/">
+
+    <key name="workspace-names" type="as">
+      <default>[]</default>
+      <summary>Custom workspace names</summary>
+      <description>
+        List of workspace names indexed by workspace number.
+      </description>
+    </key>
+
+    <key name="workspace-icons" type="as">
+      <default>[]</default>
+      <summary>Custom workspace icons</summary>
+      <description>
+        List of workspace icons/emojis indexed by workspace number.
+      </description>
+    </key>
+
+    <key name="position" type="s">
+      <default>'top-center'</default>
+      <summary>OSD position</summary>
+      <description>
+        Accepted values: top-center, center, bottom-center.
+      </description>
+    </key>
+
+    <key name="osd-duration-ms" type="i">
+      <default>1500</default>
+      <summary>OSD duration in milliseconds</summary>
+      <description>
+        Duration before auto-hide.
+      </description>
+    </key>
+
+  </schema>
+</schemalist>

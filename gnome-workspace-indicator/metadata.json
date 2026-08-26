@@ -1,0 +1,9 @@
+{
+  "uuid": "workspace-indicator@cloweling.github.io",
+  "name": "Workspace Indicator OSD",
+  "description": "Shows a custom OSD with workspace name and icon when switching workspaces.",
+  "version": 1,
+  "shell-version": ["50", "51", "52"],
+  "url": "https://github.com/Cloweling/gnome-workspace-indicator-osd",
+  "settings-schema": "org.gnome.shell.extensions.workspace-indicator"
+}
