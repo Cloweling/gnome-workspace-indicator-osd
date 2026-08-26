@@ -14,6 +14,8 @@ A GNOME Shell extension for GNOME 50+ that shows a custom on-screen display (OSD
 - Separate text and background colors for the active and inactive workspaces
 - Configurable corner radius for the OSD container and for each indicator
 - Configurable spacing between workspaces
+- Configurable font family (system monospace by default) and font size for icons and names
+- Leading and trailing spaces in names and icons are preserved, so you can pad icon fonts by hand
 - Does not touch the top panel
 - Ready for localization (i18n)
 
@@ -84,6 +86,7 @@ Open the extension preferences to configure:
 - Active/inactive text and background colors
 - Spacing between workspaces
 - Indicator corner radius
+- Font family, icon size, and text size
 
 ## Settings schema
 
@@ -103,11 +106,15 @@ Keys:
 - `inactive-text-color` (`s`) — default `rgba(255,255,255,1.0)`
 - `inactive-background-color` (`s`) — default `rgba(0,0,0,0)` (transparent)
 - `indicator-spacing` (`i`) — default `12`
+- `font-family` (`s`) — empty means the system monospace font
+- `icon-font-size` (`i`) — default `18`
+- `text-font-size` (`i`) — default `14`
 - `indicator-border-radius` (`i`) — default `10`
 
 ## Notes
 
 - Designed for GNOME Shell 50 and newer.
 - `locale/` is intentionally empty for translations.
+- Names and icons are used verbatim: spaces you type are never stripped, which is useful for padding icon-font glyphs.
 - Colors are stored as CSS strings, so any value accepted by `Gdk.RGBA` works (`rgba(...)`, `rgb(...)`, `#rrggbb`).
 - Colors and radii only apply to the icon/text display modes; the `dots` mode keeps the native GNOME dots, but still honours the container background and radius.

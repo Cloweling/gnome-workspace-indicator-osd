@@ -2,6 +2,7 @@ import Adw from 'gi://Adw';
 import Gdk from 'gi://Gdk?version=4.0';
 import GObject from 'gi://GObject';
 import Gtk from 'gi://Gtk';
+import Pango from 'gi://Pango';
 
 import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
@@ -126,6 +127,69 @@ class WorkspaceIndicatorPrefsPage extends Adw.PreferencesPage {
         ));
 
         this.add(indicatorGroup);
+
+        const fontGroup = new Adw.PreferencesGroup({
+            title: _('Font'),
+            description: _('Typography used for the workspace icons and names.'),
+        });
+
+        fontGroup.add(this._createFontRow(
+            _('Font Family'),
+            _('Defaults to the system monospace font when unset.'),
+            'font-family'
+        ));
+        fontGroup.add(this._createPixelRow(
+            _('Icon Size (px)'),
+            _('Font size of the workspace icons.'),
+            'icon-font-size',
+            128,
+            1
+        ));
+        fontGroup.add(this._createPixelRow(
+            _('Text Size (px)'),
+            _('Font size of the workspace names.'),
+            'text-font-size',
+            128,
+            1
+        ));
+
+        this.add(fontGroup);
+    }
+
+    _createFontRow(title, subtitle, key) {
+        const row = new Adw.ActionRow({title, subtitle});
+
+        const button = new Gtk.FontDialogButton({
+            dialog: new Gtk.FontDialog(),
+            level: Gtk.FontLevel.FAMILY,
+            valign: Gtk.Align.CENTER,
+            hexpand: false,
+        });
+
+        const stored = this._settings.get_string(key).trim();
+        button.set_font_desc(Pango.FontDescription.from_string(stored.length > 0 ? stored : 'monospace'));
+
+        button.connect('notify::font-desc', widget => {
+            const desc = widget.get_font_desc();
+            this._settings.set_string(key, desc ? desc.get_family() ?? '' : '');
+        });
+
+        const resetButton = new Gtk.Button({
+            icon_name: 'edit-clear-symbolic',
+            tooltip_text: _('Use the system monospace font'),
+            css_classes: ['flat'],
+            valign: Gtk.Align.CENTER,
+        });
+        resetButton.connect('clicked', () => {
+            this._settings.set_string(key, '');
+            button.set_font_desc(Pango.FontDescription.from_string('monospace'));
+        });
+
+        row.add_suffix(button);
+        row.add_suffix(resetButton);
+        row.activatable_widget = button;
+
+        return row;
     }
 
     _createColorRow(title, subtitle, key) {
@@ -151,12 +215,12 @@ class WorkspaceIndicatorPrefsPage extends Adw.PreferencesPage {
         return row;
     }
 
-    _createPixelRow(title, subtitle, key, upper = 64) {
+    _createPixelRow(title, subtitle, key, upper = 64, lower = 0) {
         const row = new Adw.SpinRow({
             title,
             subtitle,
             adjustment: new Gtk.Adjustment({
-                lower: 0,
+                lower,
                 upper,
                 step_increment: 1,
                 page_increment: 4,

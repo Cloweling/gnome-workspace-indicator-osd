@@ -92,6 +92,31 @@
       </description>
     </key>
 
+    <key name="font-family" type="s">
+      <default>''</default>
+      <summary>OSD font family</summary>
+      <description>
+        Font family used for the workspace icons and names.
+        When empty, the system monospace font is used.
+      </description>
+    </key>
+
+    <key name="icon-font-size" type="i">
+      <default>18</default>
+      <summary>Icon font size</summary>
+      <description>
+        Font size, in pixels, of the workspace icons.
+      </description>
+    </key>
+
+    <key name="text-font-size" type="i">
+      <default>14</default>
+      <summary>Text font size</summary>
+      <description>
+        Font size, in pixels, of the workspace names.
+      </description>
+    </key>
+
     <key name="indicator-spacing" type="i">
       <default>12</default>
       <summary>Spacing between workspace indicators</summary>

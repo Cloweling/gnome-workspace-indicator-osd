@@ -128,6 +128,15 @@ export default class WorkspaceIndicatorExtension extends Extension {
         return value.length > 0 ? value : 'transparent';
     }
 
+    _fontSize(key) {
+        return Math.max(1, this._settings.get_int(key));
+    }
+
+    _fontFamily() {
+        const family = this._settings.get_string('font-family').replace(/["';]/g, '').trim();
+        return family.length > 0 ? `"${family}", monospace` : 'monospace';
+    }
+
     _buildContent(info, mode, textColor) {
         const box = new St.BoxLayout({
             orientation: Clutter.Orientation.HORIZONTAL,
@@ -143,7 +152,7 @@ export default class WorkspaceIndicatorExtension extends Extension {
             box.add_child(new St.Label({
                 text: info.icon,
                 y_align: Clutter.ActorAlign.CENTER,
-                style: `font-size: 18px; color: ${textColor};`,
+                style: `font-size: ${this._fontSize('icon-font-size')}px; font-family: ${this._fontFamily()}; color: ${textColor};`,
             }));
         }
 
@@ -151,7 +160,7 @@ export default class WorkspaceIndicatorExtension extends Extension {
             box.add_child(new St.Label({
                 text: info.name,
                 y_align: Clutter.ActorAlign.CENTER,
-                style: `font-size: 14px; font-weight: 700; color: ${textColor};`,
+                style: `font-size: ${this._fontSize('text-font-size')}px; font-family: ${this._fontFamily()}; font-weight: 700; color: ${textColor};`,
             }));
         }
 
@@ -165,8 +174,8 @@ export default class WorkspaceIndicatorExtension extends Extension {
         const names = this._settings.get_strv('workspace-names');
         const icons = this._settings.get_strv('workspace-icons');
 
-        const configuredName = (names[index] ?? '').trim();
-        const configuredIcon = (icons[index] ?? '').trim();
+        const configuredName = names[index] ?? '';
+        const configuredIcon = icons[index] ?? '';
 
         return {
             name: configuredName.length > 0 ? configuredName : `${_('Workspace')} ${index + 1}`,
