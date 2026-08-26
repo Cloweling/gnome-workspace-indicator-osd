@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.workspace-indicator"
+          path="/org/gnome/shell/extensions/workspace-indicator/">
+
+    <key name="workspace-names" type="as">
+      <default>[]</default>
+      <summary>Custom workspace names</summary>
+      <description>
+        List of workspace names indexed by workspace number.
+      </description>
+    </key>
+
+    <key name="workspace-icons" type="as">
+      <default>[]</default>
+      <summary>Custom workspace icons</summary>
+      <description>
+        List of workspace icons/emojis indexed by workspace number.
+      </description>
+    </key>
+
+    <key name="workspace-count" type="i">
+      <default>4</default>
+      <summary>Configured workspace rows</summary>
+      <description>
+        How many workspaces are configurable in the preferences window.
+      </description>
+    </key>
+
+    <key name="display-mode" type="s">
+      <default>'both'</default>
+      <summary>OSD display mode</summary>
+      <description>
+        What to render inside the workspace switcher OSD.
+        Accepted values: dots, icon, text, both.
+      </description>
+    </key>
+
+    <key name="osd-duration-ms" type="i">
+      <default>1500</default>
+      <summary>OSD duration in milliseconds</summary>
+      <description>
+        Duration before the workspace switcher OSD hides.
+      </description>
+    </key>
+
+  </schema>
+</schemalist>
