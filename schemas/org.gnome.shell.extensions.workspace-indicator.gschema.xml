@@ -36,6 +36,15 @@
       </description>
     </key>
 
+    <key name="show-in-overview" type="b">
+      <default>true</default>
+      <summary>Show indicator on Overview window previews</summary>
+      <description>
+        Render the same icon/text indicator on top of each window preview
+        in the GNOME Overview, using the configured display mode.
+      </description>
+    </key>
+
     <key name="osd-duration-ms" type="i">
       <default>1500</default>
       <summary>OSD duration in milliseconds</summary>
