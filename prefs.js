@@ -65,7 +65,17 @@ class WorkspaceIndicatorPrefsPage extends Adw.PreferencesPage {
             this._settings.set_int('osd-duration-ms', Math.round(row.value));
         });
 
+        const overviewRow = new Adw.SwitchRow({
+            title: _('Show in Overview'),
+            subtitle: _('Draw the same indicator over each workspace thumbnail in the Overview.'),
+            active: this._settings.get_boolean('show-in-overview'),
+        });
+        overviewRow.connect('notify::active', row => {
+            this._settings.set_boolean('show-in-overview', row.active);
+        });
+
         group.add(modeRow);
+        group.add(overviewRow);
         group.add(durationRow);
         this.add(group);
     }
