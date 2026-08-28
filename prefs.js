@@ -22,6 +22,7 @@ class WorkspaceIndicatorPrefsPage extends Adw.PreferencesPage {
         this._rows = [];
 
         this._buildGeneralGroup();
+        this._buildOverviewGroup();
         this._buildAppearanceGroup();
         this._buildWorkspaceGroup();
         this._rebuildWorkspaceRows();
@@ -65,6 +66,17 @@ class WorkspaceIndicatorPrefsPage extends Adw.PreferencesPage {
             this._settings.set_int('osd-duration-ms', Math.round(row.value));
         });
 
+        group.add(modeRow);
+        group.add(durationRow);
+        this.add(group);
+    }
+
+    _buildOverviewGroup() {
+        const group = new Adw.PreferencesGroup({
+            title: _('Overview'),
+            description: _('Show a workspace indicator over each thumbnail in the Overview, with its own background and color, independent of the OSD colors.'),
+        });
+
         const overviewRow = new Adw.SwitchRow({
             title: _('Show in Overview'),
             subtitle: _('Draw the same indicator over each workspace thumbnail in the Overview.'),
@@ -74,9 +86,18 @@ class WorkspaceIndicatorPrefsPage extends Adw.PreferencesPage {
             this._settings.set_boolean('show-in-overview', row.active);
         });
 
-        group.add(modeRow);
         group.add(overviewRow);
-        group.add(durationRow);
+        group.add(this._createColorRow(
+            _('Background Color'),
+            _('Fills the entire thumbnail. Set the alpha channel to zero for a transparent background.'),
+            'overview-background-color'
+        ));
+        group.add(this._createColorRow(
+            _('Text Color'),
+            _('Icon and name color drawn over the thumbnail.'),
+            'overview-text-color'
+        ));
+
         this.add(group);
     }
 

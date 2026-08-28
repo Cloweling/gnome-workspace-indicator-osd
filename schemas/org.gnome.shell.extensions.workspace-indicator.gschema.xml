@@ -53,6 +53,25 @@
       </description>
     </key>
 
+    <key name="overview-background-color" type="s">
+      <default>'rgba(0,0,0,0)'</default>
+      <summary>Overview indicator background color</summary>
+      <description>
+        Background color that covers the entire workspace thumbnail in the
+        Overview. Independent from the OSD container and indicator colors.
+        Fully transparent by default.
+      </description>
+    </key>
+
+    <key name="overview-text-color" type="s">
+      <default>'rgba(255,255,255,1.0)'</default>
+      <summary>Overview indicator text color</summary>
+      <description>
+        Color used for the icon and name drawn over each workspace thumbnail
+        in the Overview. Independent from the active/inactive text colors.
+      </description>
+    </key>
+
     <key name="container-background-color" type="s">
       <default>'rgba(0,0,0,0)'</default>
       <summary>OSD container background color</summary>

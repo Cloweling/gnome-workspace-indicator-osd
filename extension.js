@@ -282,18 +282,19 @@ export default class WorkspaceIndicatorExtension extends Extension {
 
         const index = workspace.index();
         const info = this._getWorkspaceInfo(index);
-        const active = global.workspace_manager.get_active_workspace_index() === index;
-        const textColor = this._color(active ? 'active-text-color' : 'inactive-text-color');
-        const backgroundColor = this._color(active ? 'active-background-color' : 'inactive-background-color');
-        const indicatorRadius = Math.max(0, this._settings.get_int('indicator-border-radius'));
+        const textColor = this._color('overview-text-color');
+        const backgroundColor = this._color('overview-background-color');
 
         let label = existing;
         if (!label) {
             label = new St.Bin({
                 x_align: Clutter.ActorAlign.CENTER,
                 y_align: Clutter.ActorAlign.CENTER,
+                x_expand: true,
+                y_expand: true,
                 reactive: false,
             });
+            label.set_position(0, 0);
 
             // _viewport's own size is the full monitor work-area resolution
             // (it is shrunk visually via scale_x/scale_y, not via allocation),
@@ -309,20 +310,15 @@ export default class WorkspaceIndicatorExtension extends Extension {
         }
 
         label.show();
+        label.set_style(`background-color: ${backgroundColor};`);
         label.set_child(null);
 
         const content = this._buildContent(info, mode, textColor, true);
         if (!content) {
-            label.hide();
             return;
         }
 
-        content.set_style([
-            'spacing: 8px',
-            'padding: 6px 10px',
-            `background-color: ${backgroundColor}`,
-            `border-radius: ${indicatorRadius}px`,
-        ].join('; ') + ';');
+        content.set_style('spacing: 8px;');
 
         label.set_child(content);
         preview.set_child_above_sibling(label, null);
